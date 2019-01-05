@@ -17,10 +17,24 @@
 
 package net.gtaun.shoebill.dependency;
 
-import net.gtaun.shoebill.ResourceConfig;
-import net.gtaun.shoebill.ResourceConfig.RepositoryEntry;
-import net.gtaun.shoebill.ShoebillArtifactLocator;
-import net.gtaun.shoebill.ShoebillConfig;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.maven.model.Model;
@@ -40,21 +54,17 @@ import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 import org.eclipse.aether.util.repository.AuthenticationBuilder;
 
-import java.io.*;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.jar.JarFile;
-import java.util.zip.ZipEntry;
+import net.gtaun.shoebill.ResourceConfig;
+import net.gtaun.shoebill.ResourceConfig.RepositoryEntry;
+import net.gtaun.shoebill.ShoebillArtifactLocator;
+import net.gtaun.shoebill.ShoebillConfig;
 
 /**
  * @author JoJLlmAn
  * @author MK124
  * @author Marvin Haschker
  */
-public class ShoebillDependencyManager
-{
+public class ShoebillDependencyManager {
 	private static final String VERSION_FILENAME = "/version.yml";
 	private static final String SHOEBILL_CONFIG_PATH = "./shoebill/shoebill.yml";
 
@@ -68,6 +78,10 @@ public class ShoebillDependencyManager
 	@SuppressWarnings("unchecked")
 	public static void main(String[] args) throws Throwable
 	{
+		
+		
+		
+		
 		Map<String, Object> properties = resolveDependencies();
 		List<File> files = List.class.cast(properties.get(PROPERTY_JAR_FILES));
 		files.forEach(System.out::println);
@@ -78,13 +92,14 @@ public class ShoebillDependencyManager
 		if (version.getBuildNumber() != 0) startupMessage += " Build " + version.getBuildNumber();
 		startupMessage += " (for " + version.getSupport() + ")";
 
+//		System.out.println("OLEG DEBUG!!!!");
 		System.out.println(startupMessage);
 		System.out.println("Build date: " + version.getBuildDate());
 	}
 
 	public static Map<String, Object> resolveDependencies() throws Throwable
 	{
-		Logger.getRootLogger().setLevel(Level.OFF);
+		Logger.getRootLogger().setLevel(Level.DEBUG);
 		printStartupMessage();
 		ShoebillConfig shoebillConfig = new ShoebillConfig(new FileInputStream(SHOEBILL_CONFIG_PATH));
 		ResourceConfig resourceConfig = new ResourceConfig(new FileInputStream(new File(shoebillConfig.getShoebillDir(), "resources.yml")));
